@@ -44,8 +44,10 @@ function love.keypressed(key)
 		love.event.quit()
     end
     
-    if key == "up" then
-        tetrimino.rotate()
+    if key == "up" or key == "a" then 
+        tetrimino.rotate("ccw")
+    elseif key == "s" then 
+        tetrimino.rotate("cw")
     elseif key == "down" then
         tetrimino.down()
     elseif key == "left" then

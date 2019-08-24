@@ -48,11 +48,19 @@ function tetrimino.update()
     tetrimino.down()
 end
 
-function tetrimino.rotate()
-    tetrimino.rotation = tetrimino.rotation + 1
+function tetrimino.rotate(dir)
+    if dir == "ccw" then
+        tetrimino.rotation = tetrimino.rotation - 1
 
-    if tetrimino.rotation > tetrimino.rotations then
-        tetrimino.rotation = 1
+        if tetrimino.rotation < 1 then
+            tetrimino.rotation = tetrimino.rotations
+        end
+    elseif dir == "cw" then
+        tetrimino.rotation = tetrimino.rotation + 1
+
+        if tetrimino.rotation > tetrimino.rotations then
+            tetrimino.rotation = 1
+        end
     end
 end
 
