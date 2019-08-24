@@ -8,7 +8,6 @@ local tetrimino = {
 }
 
 function tetrimino.spawn(shape)
-    print(#shape)
     tetrimino.rotations = #shape
     local offset = table.getn(shape[1][1]) * matrix.cellSize
     tetrimino.x = matrix.coords.x + offset
