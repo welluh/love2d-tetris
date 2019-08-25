@@ -3,7 +3,6 @@ local tetrimino = {}
 function tetrimino.reset(shape, letter)
     tetrimino.y = -1
     tetrimino.x = 0
-    tetrimino.canvasSize = 0
     tetrimino.img = {}
     tetrimino.rotation = 1
     tetrimino.letter = letter

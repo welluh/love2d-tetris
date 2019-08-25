@@ -7,8 +7,8 @@ game = {
     x = nil,
     y = nil,
     cellSize = 28,
-    rows = 22,
-    cols = 12,
+    rows = 20,
+    cols = 10,
     occupiedCells = {},
     queue = nil,
 }
@@ -38,6 +38,7 @@ end
 function game.next()
     game.currentPiece = game.currentPiece + 1
     local c = shapes[game.queue[game.currentPiece]]
+
     if nil == c then
         game.queue = game.getBag(shapes)
         game.currentPiece = 1
@@ -48,6 +49,7 @@ function game.next()
 end
 
 function game.draw()
+    -- draw occupied cells
     for row, v in ipairs(game.occupiedCells) do
         for col, x in ipairs(v) do
             love.graphics.print(x, 5 + col * 15, 76 + row * 15)
@@ -67,9 +69,14 @@ function game.draw()
     matrix.draw()
     tetrimino.draw()
 
+    -- if tetrimino is stopped copy landed cells to occupiedCells table
     if tetrimino.state == "stopped" then
-        for i, row in ipairs(tetrimino.shape[tetrimino.rotation]) do
+        local shape = tetrimino.shape[tetrimino.rotation]
+        local rows = {}
+
+        for i, row in ipairs(shape) do
             local currentRow = tetrimino.y + i
+            table.insert(rows, currentRow)
             
             for j, col in ipairs(row) do
                 -- @TODO: get rid of the whole offset position juggling!
@@ -83,6 +90,33 @@ function game.draw()
             end
         end
 
+        -- check filled rows
+        local n = 0
+        for _, row in ipairs(rows) do
+            -- @TODO: better logic for finding out if game is over
+            if row == 0 then
+                print("Game Over!")
+                love.event.quit()
+            end
+
+            if game.occupiedCells[row] then
+                local blocks = 0
+
+                for _, col in ipairs(game.occupiedCells[row]) do
+                    if col ~= 0 and col ~= 1 then
+                        blocks = blocks + 1
+                    end
+                end
+
+                if blocks == 10 then
+                    n = n + 1
+                    table.remove(game.occupiedCells, row)
+                    table.insert(game.occupiedCells, 1, {1,0,0,0,0,0,0,0,0,0,0,1})
+                end
+            end
+        end
+
+        -- next piece
         game.next()
     end
 end
@@ -90,7 +124,7 @@ end
 function game.update(dt)
     t = t + dt
     
-    if t > 1 then
+    if t > .5 then
         t = 0
         tetrimino.update()
     end
@@ -107,7 +141,6 @@ function game.collides(x, y, shape)
             if game.occupiedCells[currentRow] 
                 and game.occupiedCells[currentRow][currentCol] 
                 and game.occupiedCells[currentRow][currentCol] ~= 0
-                and game.occupiedCells[currentRow][currentCol] ~= 'a'
                 and col == 1 then
                 return true
             end
@@ -118,7 +151,7 @@ function game.collides(x, y, shape)
 end
 
 function game.getBag(shapes)
-    return utils.shuffleTable({"I","J","L","O","S","T","Z",})
+    return utils.shuffleTable({"I","J","L","O","S","T","Z"})
 end
 
 function game.drawCell(mode, x, y)
