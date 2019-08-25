@@ -1,20 +1,24 @@
-local matrix = require("matrix")
+local tetrimino = {}
 
-local tetrimino = {
-    y = 0,
-    x = 0,
-    img = {},
-    rotation = 1
-}
+function tetrimino.reset(shape, letter)
+    tetrimino.y = -1
+    tetrimino.x = 0
+    tetrimino.canvasSize = 0
+    tetrimino.img = {}
+    tetrimino.rotation = 1
+    tetrimino.letter = letter
+    tetrimino.state = "falling"
+    tetrimino.shape = shape
+    tetrimino.rotations = table.getn(shape)
+    tetrimino.offset = table.getn(shape[1][1])
+    tetrimino.canvasSize = tetrimino.offset * game.cellSize
+end
 
-function tetrimino.spawn(shape)
-    tetrimino.rotations = #shape
-    local offset = table.getn(shape[1][1]) * matrix.cellSize
-    tetrimino.x = matrix.coords.x + offset
-    tetrimino.y = matrix.coords.y
+function tetrimino.spawn(shape, letter)
+    tetrimino.reset(shape, letter)
 
     for rotation, shape in ipairs(shape) do
-        table.insert(tetrimino.img, love.graphics.newCanvas(offset, offset))
+        table.insert(tetrimino.img, love.graphics.newCanvas(tetrimino.canvasSize, tetrimino.canvasSize))
 
         love.graphics.setCanvas(tetrimino.img[rotation])
         love.graphics.setColor(1, 0, 0)
@@ -22,10 +26,10 @@ function tetrimino.spawn(shape)
         for i, row in ipairs(shape) do
             for j, col in ipairs(row) do
                 if col == 1 then
-                    matrix.drawCell(
+                    game.drawCell(
                         'fill',
-                        (j - 1) * matrix.cellSize,
-                        (i - 1) * matrix.cellSize
+                        (j - 1) * game.cellSize,
+                        (i - 1) * game.cellSize
                     )
                 end
             end
@@ -37,11 +41,10 @@ function tetrimino.spawn(shape)
 end
 
 function tetrimino.draw()
-    love.graphics.draw(
-        tetrimino.img[tetrimino.rotation], 
-        tetrimino.x, 
-        tetrimino.y
-    )
+    local x = tetrimino.x * game.cellSize + game.x + tetrimino.canvasSize
+    local y = tetrimino.y * game.cellSize + game.y
+
+    love.graphics.draw(tetrimino.img[tetrimino.rotation], x, y)
 end
 
 function tetrimino.update()
@@ -50,30 +53,52 @@ end
 
 function tetrimino.rotate(dir)
     if dir == "ccw" then
-        tetrimino.rotation = tetrimino.rotation - 1
+        local next = tetrimino.rotation - 1
 
-        if tetrimino.rotation < 1 then
-            tetrimino.rotation = tetrimino.rotations
+        if next < 1 then
+            next = tetrimino.rotations
+        end
+
+        if not game.collides(tetrimino.x, tetrimino.y, tetrimino.shape[next]) then
+            tetrimino.rotation = next
         end
     elseif dir == "cw" then
-        tetrimino.rotation = tetrimino.rotation + 1
+        local next = tetrimino.rotation + 1
 
-        if tetrimino.rotation > tetrimino.rotations then
-            tetrimino.rotation = 1
+        if next > tetrimino.rotations then
+            next = 1
+        end
+
+        if not game.collides(tetrimino.x, tetrimino.y, tetrimino.shape[next]) then
+            tetrimino.rotation = next
         end
     end
 end
 
-function tetrimino.down(v)
-    tetrimino.y = tetrimino.y + matrix.cellSize
+function tetrimino.down()
+    local next = tetrimino.y + 1
+
+    if not game.collides(tetrimino.x, next, tetrimino.shape[tetrimino.rotation]) then
+        tetrimino.y = next
+    else
+        tetrimino.state = "stopped"
+    end
 end
 
 function tetrimino.left()
-    tetrimino.x = tetrimino.x - matrix.cellSize
+    local next = tetrimino.x - 1
+
+    if not game.collides(next, tetrimino.y, tetrimino.shape[tetrimino.rotation]) then
+        tetrimino.x = next
+    end
 end
 
 function tetrimino.right()
-    tetrimino.x = tetrimino.x + matrix.cellSize
+    local next = tetrimino.x + 1
+
+    if not game.collides(next, tetrimino.y, tetrimino.shape[tetrimino.rotation]) then
+        tetrimino.x = next
+    end
 end
 
 return tetrimino

@@ -5,4 +5,6 @@ function love.conf(t)
 	t.window.width = 800
     t.window.height = 800
     t.window.display = 2 -- @TODO: remove
+    t.window.x = 1000
+    t.window.y = 100
 end
