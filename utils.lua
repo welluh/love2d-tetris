@@ -12,14 +12,4 @@ function utils.shuffleTable(temp)
 	return temp
 end
 
-function utils.drawCell(mode, x, y)
-    love.graphics.rectangle(
-        mode,
-        x,
-        y,
-        game.cellSize - 1,
-        game.cellSize - 1
-    )
-end
-
 return utils

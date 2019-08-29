@@ -41,20 +41,11 @@ end
 function game.draw()
     matrix.draw()
     tetrimino.draw()
-    game.drawBoard()
 
-    if tetrimino.state == "stopped" then
+    if tetrimino.state == tetrimino.STOPPED then
         matrix.checkLandedBlocks(tetrimino)
         matrix.checkFilledRows(tetrimino)
         game.next()
-    end
-end
-
-function game.drawBoard()
-    for row, v in ipairs(matrix.board) do
-        for col, x in ipairs(v) do
-            love.graphics.print(x, col * 20, row * 20 + 96)
-        end
     end
 end
 

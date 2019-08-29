@@ -5,6 +5,8 @@ local tetrimino = {
     dropMode = nil,
     HARD_DROP = "hardDrop",
     SOFT_DROP = "softDrop",
+    FALLING = "falling",
+    STOPPED = "stopped",
     movementDelay = 0.07,
     inputDelay = 0.075 -- wait 75ms before allowing to move by holding down any key
 }
@@ -15,7 +17,7 @@ function tetrimino.spawn(shape, letter)
     tetrimino.dropMode = tetrimino.SOFT_DROP
     tetrimino.rotation = 1
     tetrimino.letter = letter
-    tetrimino.state = "falling"
+    tetrimino.state = tetrimino.FALLING
     tetrimino.img = {}
     tetrimino.shape = shape
     tetrimino.rotations = table.getn(shape)
@@ -103,7 +105,7 @@ function tetrimino.hardDrop()
     tetrimino.dropMode = tetrimino.HARD_DROP
     repeat
         tetrimino.down()
-    until(tetrimino.state == "stopped")
+    until(tetrimino.state == tetrimino.STOPPED)
     sfx.play(tetrimino.HARD_DROP)
     tetrimino.dropMode = tetrimino.SOFT_DROP
 end
@@ -116,7 +118,7 @@ function tetrimino.down()
         tetrimino.y = next
     else
         sfx.play(tetrimino.SOFT_DROP)
-        tetrimino.state = "stopped"
+        tetrimino.state = tetrimino.STOPPED
     end
 end
 
