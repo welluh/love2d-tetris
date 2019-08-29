@@ -1,9 +1,13 @@
 local utils = require("utils")
 
-local tetrimino = {}
+local tetrimino = {
+    t = 0,
+    movementDelay = 0.07,
+    inputDelay = 0.075 -- wait 75ms before allowing to move by holding down any key
+}
 
 function tetrimino.spawn(shape, letter)
-    tetrimino.y = -1
+    tetrimino.y = 0
     tetrimino.x = 4
     tetrimino.img = {}
     tetrimino.rotation = 1
@@ -46,8 +50,22 @@ function tetrimino.draw()
     love.graphics.draw(tetrimino.img[tetrimino.rotation], x, y)
 end
 
-function tetrimino.update()
-    tetrimino.down()
+function tetrimino.update(dt)
+    local key = love.keyboard.isDown
+    tetrimino.t = tetrimino.t + dt
+
+    if tetrimino.t > tetrimino.inputDelay then
+        if tetrimino.t > tetrimino.movementDelay then
+            if key("left") then
+                tetrimino.left()
+            elseif key("right") then
+                tetrimino.right()
+            elseif key("down") then
+                tetrimino.down()
+            end
+            tetrimino.t = 0
+        end
+    end
 end
 
 function tetrimino.rotate(dir)
@@ -75,7 +93,9 @@ function tetrimino.rotate(dir)
 end
 
 function tetrimino.hardDrop()
-    game.speed = 0.001
+    repeat
+        tetrimino.down()
+    until(tetrimino.state == "stopped")
 end
 
 function tetrimino.down()
@@ -96,6 +116,8 @@ function tetrimino.left()
     if not game.collides(coords) then
         tetrimino.x = next
     end
+
+    tetrimino.t = 0
 end
 
 function tetrimino.right()
@@ -105,6 +127,8 @@ function tetrimino.right()
     if not game.collides(coords) then
         tetrimino.x = next
     end
+
+    tetrimino.t = 0
 end
 
 function tetrimino.getCoordinates(y, x, shape)

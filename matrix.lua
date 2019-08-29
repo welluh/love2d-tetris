@@ -70,7 +70,9 @@ function matrix.checkLandedBlocks(tetrimino)
             local occupied = x.occupied
 
             -- copy landed cells to game board table
-            if occupied ~= 0 then
+            if occupied ~= 0 and
+                matrix.board[currentRow] and
+                matrix.board[currentRow][currentCol] then
                 matrix.board[currentRow][currentCol] = tetrimino.letter
             end
         end

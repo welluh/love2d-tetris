@@ -60,10 +60,12 @@ end
 
 function game.update(dt)
     t = t + dt
-    
+    tetrimino.update(dt)
+
+    -- auto drop on each step
     if t > game.speed then
         t = 0
-        tetrimino.update()
+        tetrimino.down()
     end
 end
 
@@ -91,20 +93,20 @@ function game.getBag(shapes)
 end
 
 function love.keypressed(key)
-	if key == "escape" then
+    if key == "escape" then
 		love.event.quit()
     end
-    
+
     if key == "up" or key == "a" then 
         tetrimino.rotate("ccw")
+    elseif key == "left" then 
+        tetrimino.left()
+    elseif key == "right" then
+        tetrimino.right()
     elseif key == "s" then 
         tetrimino.rotate("cw")
     elseif key == "down" then
         tetrimino.down()
-    elseif key == "left" then
-        tetrimino.left()
-    elseif key == "right" then
-        tetrimino.right()
     elseif key == "space" then
         tetrimino.hardDrop()
     end
