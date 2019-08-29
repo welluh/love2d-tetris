@@ -114,6 +114,7 @@ function matrix.checkFilledRows(tetrimino)
             end
             
             if filledRow then
+                sfx.play("clear")
                 table.remove(matrix.board, row)
                 table.insert(matrix.board, 1, {1,0,0,0,0,0,0,0,0,0,0,1})
             end

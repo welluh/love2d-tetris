@@ -99,7 +99,7 @@ function love.keypressed(key)
 
     if key == "up" or key == "a" then 
         tetrimino.rotate("ccw")
-    elseif key == "left" then 
+    elseif key == "left" then
         tetrimino.left()
     elseif key == "right" then
         tetrimino.right()

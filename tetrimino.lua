@@ -2,6 +2,9 @@ local utils = require("utils")
 
 local tetrimino = {
     t = 0,
+    dropMode = nil,
+    HARD_DROP = "hardDrop",
+    SOFT_DROP = "softDrop",
     movementDelay = 0.07,
     inputDelay = 0.075 -- wait 75ms before allowing to move by holding down any key
 }
@@ -9,10 +12,11 @@ local tetrimino = {
 function tetrimino.spawn(shape, letter)
     tetrimino.y = 0
     tetrimino.x = 4
-    tetrimino.img = {}
+    tetrimino.dropMode = tetrimino.SOFT_DROP
     tetrimino.rotation = 1
     tetrimino.letter = letter
     tetrimino.state = "falling"
+    tetrimino.img = {}
     tetrimino.shape = shape
     tetrimino.rotations = table.getn(shape)
     tetrimino.canvasSize = table.getn(shape[1][1]) * game.cellSize
@@ -88,14 +92,21 @@ function tetrimino.rotate(dir)
     local coords = tetrimino.getCoordinates(tetrimino.y, tetrimino.x, tetrimino.shape[next])
 
     if not game.collides(coords) then
+        if tetrimino.letter ~= 'o' then
+            sfx.play("rotate")
+        end
+        
         tetrimino.rotation = next
     end
 end
 
 function tetrimino.hardDrop()
+    tetrimino.dropMode = tetrimino.HARD_DROP
     repeat
         tetrimino.down()
     until(tetrimino.state == "stopped")
+    sfx.play(tetrimino.HARD_DROP)
+    tetrimino.dropMode = tetrimino.SOFT_DROP
 end
 
 function tetrimino.down()
@@ -105,6 +116,7 @@ function tetrimino.down()
     if not game.collides(coords) then
         tetrimino.y = next
     else
+        sfx.play(tetrimino.SOFT_DROP)
         tetrimino.state = "stopped"
     end
 end
