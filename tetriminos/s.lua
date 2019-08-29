@@ -1,5 +1,5 @@
 local shape = {
-    letter = 's',
+    letter = 'S',
     rotations = {
         {
             {0,0,0,0},

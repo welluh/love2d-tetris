@@ -1,7 +1,7 @@
 function love.load()
     require "game"
     require "sfx"
-    -- require "graphics"
+    require "graphics"
     
     -- seed the rng, calling math.random() a couple of times
     -- seems to give reasonably random pieces each time
@@ -11,7 +11,7 @@ function love.load()
     t = 0
 
     sfx.load()
-    -- graphics.load()
+    graphics.load()
     game.run()
 end
 

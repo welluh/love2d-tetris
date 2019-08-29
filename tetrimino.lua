@@ -28,13 +28,12 @@ function tetrimino.prepareDrawables()
         table.insert(tetrimino.img, love.graphics.newCanvas(tetrimino.canvasSize, tetrimino.canvasSize))
 
         love.graphics.setCanvas(tetrimino.img[rotation])
-        love.graphics.setColor(1, 0, 0)
 
         for i, row in ipairs(shape) do
             for j, col in ipairs(row) do
                 if col == 1 then
-                    utils.drawCell(
-                        'fill',
+                    love.graphics.draw(
+                        graphics.blocks[tetrimino.letter],
                         (j - 1) * game.cellSize,
                         (i - 1) * game.cellSize
                     )

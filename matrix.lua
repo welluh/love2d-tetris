@@ -14,20 +14,6 @@ function matrix.draw()
     matrix.drawLandedBlocks()
 end
 
-function matrix.drawLandedBlocks()
-    for row, v in ipairs(matrix.board) do
-        for col, x in ipairs(v) do
-            if x ~= 0 and x ~= 1 then
-                utils.drawCell(
-                    'fill',
-                    game.x + (col - 2) * game.cellSize,
-                    game.y + (row - 1) * game.cellSize
-                )
-            end
-        end
-    end
-end
-
 function matrix.prepareBoard()
     -- if position is outside the actual playing field mark it as 1
     -- otherwise mark as 0. These are the outer bounds of the playing field,
@@ -46,12 +32,12 @@ function matrix.prepareDrawable()
 
     love.graphics.setBackgroundColor(0, 0, 0)
     love.graphics.setCanvas(matrix.canvas)
-    love.graphics.setColor(1, 1, 1, .75)
+    love.graphics.setColor(.2, .2, .2, .85)
 
     for row = 1, game.rows do
         for col = 1, game.cols do
-            utils.drawCell(
-                'line', 
+            love.graphics.draw(
+                graphics.BG,
                 game.x + (col - 1) * game.cellSize,
                 game.y + (row - 1) * game.cellSize
             )
@@ -60,6 +46,23 @@ function matrix.prepareDrawable()
     
     love.graphics.setColor(1, 1, 1)
     love.graphics.setCanvas()
+end
+
+function matrix.drawLandedBlocks()
+    for row, v in ipairs(matrix.board) do
+        for col, letter in ipairs(v) do
+            if letter ~= 0 and letter ~= 1 then
+                -- offset by amount of wall tiles
+                local currentCol = col - 2
+
+                love.graphics.draw(
+                    graphics.blocks[letter],
+                    game.x + (currentCol) * game.cellSize,
+                    game.y + (row - 1) * game.cellSize
+                )
+            end
+        end
+    end
 end
 
 function matrix.checkLandedBlocks(tetrimino)
