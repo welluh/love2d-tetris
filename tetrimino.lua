@@ -1,22 +1,22 @@
+local utils = require("utils")
+
 local tetrimino = {}
 
-function tetrimino.reset(shape, letter)
+function tetrimino.spawn(shape, letter)
     tetrimino.y = -1
-    tetrimino.x = 0
+    tetrimino.x = 4
     tetrimino.img = {}
     tetrimino.rotation = 1
     tetrimino.letter = letter
     tetrimino.state = "falling"
     tetrimino.shape = shape
     tetrimino.rotations = table.getn(shape)
-    tetrimino.offset = table.getn(shape[1][1])
-    tetrimino.canvasSize = tetrimino.offset * game.cellSize
+    tetrimino.canvasSize = table.getn(shape[1][1]) * game.cellSize
+    tetrimino.prepareDrawables()
 end
 
-function tetrimino.spawn(shape, letter)
-    tetrimino.reset(shape, letter)
-
-    for rotation, shape in ipairs(shape) do
+function tetrimino.prepareDrawables()
+    for rotation, shape in ipairs(tetrimino.shape) do
         table.insert(tetrimino.img, love.graphics.newCanvas(tetrimino.canvasSize, tetrimino.canvasSize))
 
         love.graphics.setCanvas(tetrimino.img[rotation])
@@ -25,7 +25,7 @@ function tetrimino.spawn(shape, letter)
         for i, row in ipairs(shape) do
             for j, col in ipairs(row) do
                 if col == 1 then
-                    game.drawCell(
+                    utils.drawCell(
                         'fill',
                         (j - 1) * game.cellSize,
                         (i - 1) * game.cellSize
@@ -40,8 +40,8 @@ function tetrimino.spawn(shape, letter)
 end
 
 function tetrimino.draw()
-    local x = tetrimino.x * game.cellSize + game.x + tetrimino.canvasSize
-    local y = tetrimino.y * game.cellSize + game.y
+    local x = tetrimino.x * game.cellSize + game.x - game.cellSize
+    local y = tetrimino.y * game.cellSize + game.y - game.cellSize
 
     love.graphics.draw(tetrimino.img[tetrimino.rotation], x, y)
 end
@@ -51,33 +51,38 @@ function tetrimino.update()
 end
 
 function tetrimino.rotate(dir)
+    local next
+
     if dir == "ccw" then
-        local next = tetrimino.rotation - 1
+        next = tetrimino.rotation - 1
 
         if next < 1 then
             next = tetrimino.rotations
         end
-
-        if not game.collides(tetrimino.x, tetrimino.y, tetrimino.shape[next]) then
-            tetrimino.rotation = next
-        end
     elseif dir == "cw" then
-        local next = tetrimino.rotation + 1
+        next = tetrimino.rotation + 1
 
         if next > tetrimino.rotations then
             next = 1
         end
-
-        if not game.collides(tetrimino.x, tetrimino.y, tetrimino.shape[next]) then
-            tetrimino.rotation = next
-        end
     end
+
+    local coords = tetrimino.getCoordinates(tetrimino.y, tetrimino.x, tetrimino.shape[next])
+
+    if not game.collides(coords) then
+        tetrimino.rotation = next
+    end
+end
+
+function tetrimino.hardDrop()
+    game.speed = 0.001
 end
 
 function tetrimino.down()
     local next = tetrimino.y + 1
+    local coords = tetrimino.getCoordinates(next, tetrimino.x, tetrimino.shape[tetrimino.rotation])
 
-    if not game.collides(tetrimino.x, next, tetrimino.shape[tetrimino.rotation]) then
+    if not game.collides(coords) then
         tetrimino.y = next
     else
         tetrimino.state = "stopped"
@@ -86,18 +91,40 @@ end
 
 function tetrimino.left()
     local next = tetrimino.x - 1
+    local coords = tetrimino.getCoordinates(tetrimino.y, next, tetrimino.shape[tetrimino.rotation])
 
-    if not game.collides(next, tetrimino.y, tetrimino.shape[tetrimino.rotation]) then
+    if not game.collides(coords) then
         tetrimino.x = next
     end
 end
 
 function tetrimino.right()
     local next = tetrimino.x + 1
+    local coords = tetrimino.getCoordinates(tetrimino.y, next, tetrimino.shape[tetrimino.rotation])
 
-    if not game.collides(next, tetrimino.y, tetrimino.shape[tetrimino.rotation]) then
+    if not game.collides(coords) then
         tetrimino.x = next
     end
+end
+
+function tetrimino.getCoordinates(y, x, shape)
+    y = y or tetrimino.y
+    x = x or tetrimino.x
+    shape = shape or tetrimino.shape[tetrimino.rotation]
+
+    local coords = {}
+    for i, row in ipairs(shape) do
+        coords[i] = {}
+        for j, occupied in ipairs(row) do
+            table.insert(coords[i], {
+                row = y + i - 1,
+                col = x + j,
+                occupied = occupied
+            })
+        end
+    end
+
+    return coords
 end
 
 return tetrimino

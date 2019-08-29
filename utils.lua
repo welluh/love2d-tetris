@@ -1,7 +1,7 @@
 local utils = {}
 
 function utils.shuffleTable(temp)
-	local n = #temp
+	local n = table.getn(temp)
 		
 	for i = 1, n do
 		local k = math.random(n)
@@ -12,5 +12,14 @@ function utils.shuffleTable(temp)
 	return temp
 end
 
+function utils.drawCell(mode, x, y)
+    love.graphics.rectangle(
+        mode,
+        x,
+        y,
+        game.cellSize - 1,
+        game.cellSize - 1
+    )
+end
 
 return utils

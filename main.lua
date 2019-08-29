@@ -8,7 +8,6 @@ function love.load()
     -- game timer
     t = 0
 
-    game.init()
     game.run()
 end
 
