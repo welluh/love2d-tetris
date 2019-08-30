@@ -2,6 +2,7 @@ local utils = require("utils")
 local matrix = require("matrix")
 local tetrimino = require("tetrimino")
 local shapes = require("tetriminos/all")
+local hud = require("hud")
 
 game = {
     x = nil,
@@ -27,18 +28,21 @@ function game.next()
     game.currentPiece = game.currentPiece + 1
 
     local shape = shapes[game.queue[game.currentPiece]]
+    local next = shapes[game.queue[game.currentPiece + 1]]
 
     -- draw new bag of tetriminos
-    if nil == shape then
+    if nil == next then
         game.queue = game.getBag(shapes)
-        game.currentPiece = 1
-        shape = shapes[game.queue[game.currentPiece]]
+        game.currentPiece = 0
+        next = shapes[game.queue[game.currentPiece + 1]]
     end
 
     tetrimino.spawn(shape.rotations, shape.letter)
+    hud.spawn(next)
 end
 
 function game.draw()
+    hud.draw()
     matrix.draw()
     tetrimino.draw()
 

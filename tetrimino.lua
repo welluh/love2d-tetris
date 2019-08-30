@@ -1,4 +1,5 @@
 local utils = require("utils")
+local shapes = require("tetriminos/all")
 
 local tetrimino = {
     t = 0,
@@ -93,7 +94,7 @@ function tetrimino.rotate(dir)
     local coords = tetrimino.getCoordinates(tetrimino.y, tetrimino.x, tetrimino.shape[next])
 
     if not game.collides(coords) then
-        if tetrimino.letter ~= 'o' then
+        if tetrimino.letter ~= shapes.O.letter then
             sfx.play("rotate")
         end
         
